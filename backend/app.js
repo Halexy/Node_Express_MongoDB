@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
-const Thing = require('./models/thing');
+const stuffRoutes = require('./routes/stuff');
 
 mongoose.connect('mongodb+srv://Halexy:nh3mG3k8@cluster0.ql2hd.mongodb.net/test?retryWrites=true&w=majority',
   { useNewUrlParser: true,
@@ -22,31 +22,7 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 
-// Save data
-app.post('/api/stuff', (req, res, next) => {
-  delete req.body._id; //Remove id from the request corp
-  const thing = new Thing({
-    //Spread syntax
-    ...req.body
-  });
-  thing.save()
-    .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
-    .catch(error => res.status(400).json({ error }));
-});
-
-// View specific product by id
-app.get('/api/stuff/:id', (req, res, next) => {
-  Thing.findOne({ _id: req.params.id })
-  // If it's good, send to frontend
-  .then(things => res.status(200).json(things))
-  .catch(error => res.status(400).json({ error }));
-});
-
-// View all products
-app.get('/api/stuff', (req, res, next) => {
-  Thing.find()
-    .then(thing => res.status(200).json(thing))
-    .catch(error => res.status(404).json({ error }));
-});
+// Import router
+app.use('/api/stuff', stuffRoutes);
 
 module.exports = app;
