@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 
 const stuffRoutes = require('./routes/stuff');
 
+// Connect DB
 mongoose.connect('mongodb+srv://Halexy:nh3mG3k8@cluster0.ql2hd.mongodb.net/test?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
