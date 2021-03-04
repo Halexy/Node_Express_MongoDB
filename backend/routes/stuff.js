@@ -1,22 +1,23 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../middleware/auth');
 
 const stuffCtrl = require('../controllers/stuff');
 
 // Save data
-router.post('/', stuffCtrl.createThing);
+router.post('/', auth, stuffCtrl.createThing);
   
 // Edit product
-router.put('/:id', stuffCtrl.modifyThing);
+router.put('/:id', auth, stuffCtrl.modifyThing);
   
 // Delete product
-router.delete('/:id', stuffCtrl.deleteThing);
+router.delete('/:id', auth, stuffCtrl.deleteThing);
   
 // View specific product by id
-router.get('/:id', stuffCtrl.getOneThing);
+router.get('/:id', auth, stuffCtrl.getOneThing);
   
 // View all products
-router.get('/', stuffCtrl.getAllThing);
+router.get('/', auth, stuffCtrl.getAllThing);
   
 // Export router
 module.exports = router;
