@@ -2,10 +2,11 @@ const Thing = require('../models/Thing');
 
 // Create one object
 exports.createThing = (req, res, next) => {
-    delete req.body._id; //Remove id from the request corp
+    const thingObject = JSON.parse(req.body.thing); // Parse using JSON.parse to get a usable object
+    delete thingObject._id; // Remove id from the request corp
     const thing = new Thing({
-      //Spread syntax
-      ...req.body
+      ...thingObject,   //Spread syntax
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`  // Resolve image's path
     });
     thing.save()
       .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
@@ -14,10 +15,16 @@ exports.createThing = (req, res, next) => {
 
 // Edit object
 exports.modifyThing = (req, res, next) => {
-    Thing.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id })
-    .then(() => res.status(200).json({ message: 'Objet modifié !'}))
-    .catch(error => res.status(400).json({ error }));
-};
+    const thingObject = req.file ?  // if req.file exists, process the new image
+      {
+        ...JSON.parse(req.body.thing),
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+      } : { ...req.body }; // else, process the incoming object
+
+    Thing.updateOne({ _id: req.params.id }, { ...thingObject, _id: req.params.id })
+      .then(() => res.status(200).json({ message: 'Objet modifié !'}))
+      .catch(error => res.status(400).json({ error }));
+  };
 
 // Delete object
 exports.deleteThing = (req, res, next) => {
