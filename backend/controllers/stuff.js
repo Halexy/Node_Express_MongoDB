@@ -1,4 +1,5 @@
 const Thing = require('../models/Thing');
+const fs = require('fs');
 
 // Create one object
 exports.createThing = (req, res, next) => {
@@ -28,9 +29,16 @@ exports.modifyThing = (req, res, next) => {
 
 // Delete object
 exports.deleteThing = (req, res, next) => {
-    Thing.deleteOne({ _id:req.params.id })
-    .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
-    .catch(error => res.status(400).json({ error }));
+    Thing.findOne({ _id: req.params.id })  // Find the object in the DB
+        .then(thing => {
+            const filename = thing.imageUrl.split('/images/')[1]; // When it is found, extract the name of the file
+            fs.unlink(`images/${filename}`, () => { // Delete this file with fs.unlink          
+                Thing.deleteOne({ _id: req.params.id })  // Delete object in the DB
+                .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
+                .catch(error => res.status(400).json({ error }));
+            });
+        })
+        .catch(error => res.status(500).json({ error }));
 };
 
 // Collect one object
